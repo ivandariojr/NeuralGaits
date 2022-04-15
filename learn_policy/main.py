@@ -1,18 +1,15 @@
 from pathlib import Path
-import pl_modules
-import barriers
 import hydra
 import pytorch_lightning as pl
-from models import D1MLP, MLP
+from common.models import D1MLP
 import torch.utils.data
 from torch.utils.data import Dataset
 import torch as th
 from omegaconf import OmegaConf
 from pytorch_lightning import loggers as pl_loggers
 from dynamics import RefinementZeroDynamics, ZeroDynamics
-import math
 
-import exp_cfg
+from common import exp_cfg
 
 ROOT = Path(__file__).parent
 run_data_root = ROOT / 'run_data'
@@ -158,12 +155,18 @@ class Experiment:
 
         self.cfg = cfg
 
-        logger = pl_loggers.WandbLogger(
+        # logger = pl_loggers.WandbLogger(
+        #     name=self.create_log_name(),
+        #     entity="ivan",
+        #     project=project,
+        #     log_model = "all",
+        #     save_dir=str(run_data_root / 'wandb_output'),
+        # )
+        logger = pl_loggers.TensorBoardLogger(
             name=self.create_log_name(),
-            entity="ivan",
-            project=project,
-            log_model = "all",
-            save_dir=str(run_data_root / 'wandb_output'),
+            # project=project,
+            # log_model = "all",
+            save_dir=str(run_data_root / 'tensorboard_output'),
         )
         logger.log_hyperparams(dict(self.cfg))
         OmegaConf.resolve(cfg)
@@ -301,7 +304,7 @@ def fill_mask_pairs(cfg):
             ]
         ),
         exp_cfg.MaskBarrierPair(
-            mask=exp_cfg.BothGuardMask(edge=0.2,offset=0.01),
+            mask=exp_cfg.BothGuardMask(edge=0.2, offset=0.01),
             # mask=exp_cfg.RealGuardMask(),
             barriers_list=[
                 # exp_cfg.DiscreteTimeOrbitalBarrier(lb=.5, ub=1.5, alpha_lb=0, alpha_ub=0),

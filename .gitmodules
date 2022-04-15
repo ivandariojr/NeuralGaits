@@ -1,0 +1,3 @@
+[submodule "libs/nero"]
+	path = libs/nero
+	url = https://github.com/jxbz/nero
