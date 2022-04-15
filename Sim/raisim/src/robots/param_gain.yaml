@@ -1,0 +1,13 @@
+P: 400
+D: 4
+
+td0: 0
+xd0: 0.9
+z0: 1.32
+
+Torso0: -0.06827
+
+stone_pos: [-0.13, 0.36, 0.4, 0.3, 0.3, 0.3, 0.3, 0.4, 0.4]
+stone_width: 0.15
+stone_thickness: .1
+num_stones: 12

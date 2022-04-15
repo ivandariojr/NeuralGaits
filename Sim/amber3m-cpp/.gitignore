@@ -1,0 +1,6 @@
+build/
+documentation/
+*.swp
+AMBER_errors
+Data/
+*.pdf
