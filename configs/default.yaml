@@ -1,0 +1,25 @@
+defaults:
+  - module/composite_barrier: CompositeBarrier
+  - module/zdyn: ZeroDynamics
+  - module/yd: CubicMLP
+  - module: GeneralLearning
+  - experiment
+  - _self_
+
+data_loader_workers: 0
+max_epochs: 1000
+batch_size: 4096
+#pretrained_model: /home/noel/learn_trajopt/AMBER/models/distilled9999.th
+#pretrained_zdyn: "model-30knx72j:v217"
+gpus: 1
+seed: 1
+dataset: OrbitalSampler
+module:
+  lr: 1e-2
+  opt_name: 'AdamW'
+  weight_decay: 1e-4
+  momentum: 0.9
+#  decay_epochs: [50, 400, 800]
+  decay_epochs: [100, 400, 800]
+#  yd:
+#    n_hidden: 1
