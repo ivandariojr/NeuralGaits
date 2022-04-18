@@ -2,9 +2,9 @@
 
 ## Setting up the Simulation Environment
 ### RaiSim
-As the RaiSim environment is used for the robot simulation, the first step is to get a license key [here](https://raisim.com/sections/License.html) (free for academic use). Next, follow the [installation instructions](https://raisim.com/sections/Installation.html), making sure to build with examples (include the cmake argument -DRAISIM_EXAMPLE=ON). Additionally, the RaiSim Ogre (an Ogre based visualizer) is used to see the robot simulation, found [here](https://github.com/raisimTech/raisimOgre).
+As the RaiSim environment is used for the robot simulation, the first step is to get a license key [here](https://raisim.com/sections/License.html) (free for academic use). Next, follow the [installation instructions](https://raisim.com/sections/Installation.html), making sure to build with examples (include the cmake argument -DRAISIM_EXAMPLE=ON) and setting -DCMAKE_INSTALL_PREFIX=$LOCAL_INSTALL, replacing $LOCAL_INSTALL with the directory you would like to install to. Additionally, the RaiSim Ogre (an Ogre based visualizer) is used to see the robot simulation, found [here](https://github.com/raisimTech/raisimOgre).
 
-Once installed, check to make sure the included examples run properly. Then, in the folder where raisimOgre was cloned, delete the examples folder, and add a symlink to the NeuralGaits/Sim/raisim folder:
+Once installed, check to make sure the included examples run properly. To do this, cd to the ```raisimOgre/build/examples``` directory and try executing one of the examples (make sure to put your activation key in the right place). Then, in the folder where raisimOgre was cloned (the src folder), delete the examples folder, and add a symlink to the NeuralGaits/Sim/raisim folder:
 ```ln -s ${REPO_DIR}/NeuralGaits/Sim/raisim examples```
 Then, go to the raisimOgre/build/exmaples folder, and re-make. After this step, there should be an executable titled ''amber''.
 ### amber3m-cpp
