@@ -1,3 +1,21 @@
 [submodule "libs/nero"]
 	path = libs/nero
 	url = https://github.com/jxbz/nero
+[submodule "Sim/libs-cpp/ogre"]
+	path = Sim/libs-cpp/ogre
+	url = https://github.com/OGRECave/ogre.git
+[submodule "Sim/libs-cpp/osqp"]
+	path = Sim/libs-cpp/osqp
+	url = https://github.com/osqp/osqp.git
+[submodule "Sim/libs-cpp/osqp-eigen"]
+	path = Sim/libs-cpp/osqp-eigen
+	url = https://github.com/robotology/osqp-eigen.git
+[submodule "Sim/libs-cpp/raisimLib"]
+	path = Sim/libs-cpp/raisimLib
+	url = https://github.com/raisimTech/raisimLib.git
+[submodule "Sim/libs-cpp/raisimOgre"]
+	path = Sim/libs-cpp/raisimOgre
+	url = https://github.com/raisimTech/raisimOgre.git
+[submodule "Sim/libs-cpp/yaml-cpp"]
+	path = Sim/libs-cpp/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git
