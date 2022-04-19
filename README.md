@@ -1,4 +1,24 @@
 # Neural Gaits
+## Setting up the Learning Environment
+Install the python dependencies listed in ``requirements.txt``.
+```
+pip -r requirements.txt
+```
+### Policy Learning
+
+Run the following command to train a walking policy from scratch using the 
+nominal model. This command assumes the working directory is 
+``/path/to/NeuralGaits/learn_policy``:
+
+```
+PYTHONPATH=$PYTHONPATH:/path/to/NeuralGaits/common:/path/to/NeuralGaits
+/common/RaiSimDynamics main.py
+```
+
+### Dynamics Learning
+
+### Policy Refinement
+
 
 ## Setting up the Simulation Environment
 First, we recommend setting ```${INSTALL_DIR}``` to be a convenient directory where you would like everything to be installed (via the export command in your bashrc, for example). Then, for all cmake commands below, add

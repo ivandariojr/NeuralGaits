@@ -12,7 +12,7 @@ find_package(osqp REQUIRED)
 find_package(OsqpEigen REQUIRED)
 
 # L4DC learning traj_opt
-find_package(learn_trajopt_cpp REQUIRED CONFIG)
+find_package(learn-trajopt-cpp REQUIRED CONFIG)
 find_package(Torch REQUIRED)
 find_package(yaml-cpp REQUIRED CONFIG NO_DEFAULT_PATH)
 
@@ -150,7 +150,7 @@ target_include_directories(Sim PUBLIC  ${EIGEN3_INCLUDE_DIR})
 target_include_directories(Sim PUBLIC ${inc_dir})
 
 target_include_directories(robot-lib PUBLIC src)
-target_link_libraries(robot-lib learn_trajopt_cpp::learn_trajopt_cpp)
+target_link_libraries(robot-lib learn-trajopt-cpp::learn-trajopt-cpp)
 target_link_libraries(robot-lib ${TORCH_LIBRARIES})
 target_link_libraries(robot-lib osqp::osqp)
 target_link_libraries(robot-lib Sim)

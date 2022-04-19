@@ -1,0 +1,7 @@
+torchdiffeq
+torch
+torchvision
+torchaudio
+matplotlib
+pytorch-lightning
+hydra-core
