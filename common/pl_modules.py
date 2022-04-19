@@ -6,7 +6,6 @@ import numpy as np
 import pytorch_lightning as pl
 import torch
 import torch as th
-import wandb
 from torch import nn
 from torch.autograd.functional import jvp
 from torch.nn import functional as F, Parameter
@@ -80,37 +79,7 @@ class GeneralLearning(pl.LightningModule):
         else:
             raise RuntimeError(
                 f"[ERROR] Invalid Optimizer Param: {self.opt_name}")
-        # def lambda_lr_warmstarted(epoch_num):
-        #     if epoch_num > 1:
-        #         return (float(self.decay_epochs[-1]) - epoch_num) / float(self.decay_epochs[-1])
-        #     else:
-        #         return 1
-        # scheduler = th.optim.lr_scheduler.LambdaLR(
-        #     optimizer=optimizer,
-        #     lr_lambda=[lambda_lr_warmstarted]
-        # )
-        # scheduler = th.optim.lr_scheduler.StepLR(
-        #     optimizer=optimizer,
-        #     step_size=1,
-        #     gamma=0.8,
-        #     # last_epoch=self.decay_epochs[-1]
-        # )
-        # scheduler = th.optim.lr_scheduler.CosineAnnealingLR(
-        #     optimizer=optimizer,
-        #     T_max=self.decay_epochs[-1]
-        # )
-        # scheduler = th.optim.lr_scheduler.ReduceLROnPlateau(
-        #     optimizer=optimizer,
-        #     factor=0.1,
-        #     patience=30,
-        #     min_lr=1e-4)
-        # scheduler = th.optim.lr_scheduler.CosineAnnealingWarmRestarts(
-        #     optimizer=optimizer,
-        #     T_0=30,
-        #     T_mult=1,
-        #     eta_min=1e-4,
-        #     last_epoch=-1
-        # )
+
         scheduler = th.optim.lr_scheduler.MultiStepLR(optimizer=optimizer,
                                                milestones=self.decay_epochs,
                                                gamma=0.1)
@@ -151,49 +120,6 @@ class GeneralLearning(pl.LightningModule):
 
         violation_means = th.cat(violation_means, dim=0)
         assert len(violation_means.detach().cpu().numpy()) == len(self.cb_name_list), "[ERROR] Col Names doesnt match barrier output"
-        plt.figure()
-        plt.bar(height=violation_means.detach().cpu().numpy(),
-                x=self.cb_name_list)
-
-        plt.xticks(rotation=-90)
-        plt.title(f'Epoch {self.current_epoch}')
-        plt.tight_layout()
-
-        self.logger.experiment.log({"Violations": wandb.Image(plt)},
-                                    commit=False)
-        plt.close()
-        #TODO: Thisis a hack it should be using the actual guard masks in
-        # barrier_violations
-        # self.logger.experiment.log
-        guard_samples= self.zdyn.pos_event_function(0.0, zs)[:, 0]
-        guard_sample_mask = (guard_samples > -1e-3) * (guard_samples < 0)
-        plt.figure()
-        # plt.fill(np.array([.3, .3, -0.3, -0.3]),
-        #          np.array([-50, 50., 50., -50.]), edgecolor="orange",
-        #          facecolor="none")
-        plt.scatter(zs[:, 0].cpu().detach().numpy(),
-                    zs[:, 1].cpu().detach().numpy(),
-                    color='g')
-        plt.scatter(zs_post[:, 0].cpu().detach().numpy(),
-                    zs_post[:, 1].cpu().detach().numpy(), color='b')
-        if len(self.composite_barrier.pairs) > 1:
-            forward_mask = self.composite_barrier.pairs[1].mask(zs)
-            plt.scatter(
-                zs[forward_mask, 0].cpu().detach().numpy(),
-                zs[forward_mask, 1].cpu().detach().numpy(),
-                color='orange')
-        plt.scatter(zs[guard_sample_mask, 0].cpu().detach().numpy(),
-                    zs[guard_sample_mask, 1].cpu().detach().numpy(),
-                    color='black')
-        plt.scatter(zs_post[guard_sample_mask, 0].cpu().detach().numpy(),
-                    zs_post[guard_sample_mask, 1].cpu().detach().numpy(),
-                    color='r')
-
-        plt.title(f'Epoch {self.current_epoch}')
-        plt.tight_layout()
-        self.logger.experiment.log({"ZState": wandb.Image(plt)},
-                                    commit=False)
-        plt.close()
         self.log('training_loss', loss, on_step=False,
                                         on_epoch=True,
                                         logger=True)
@@ -209,7 +135,6 @@ class GeneralLearning(pl.LightningModule):
         raise NotImplementedError("[ERROR] Does not make sense for this.")
 
     def on_save_checkpoint(self, checkpoint: Dict[str, Any]) -> None:
-        # super().on_save_checkpoint(checkpoint)
         checkpoint['yd'] = self.yd
 
 
@@ -285,40 +210,12 @@ class DynLearning(pl.LightningModule):
         else:
             raise RuntimeError(
                 f"[ERROR] Invalid Optimizer Param: {self.opt_name}")
-        # def lambda_lr_warmstarted(epoch_num):
-        #     if epoch_num > 1:
-        #         return (float(self.decay_epochs[-1]) - epoch_num) / float(self.decay_epochs[-1])
-        #     else:
-        #         return 1
-        # scheduler = th.optim.lr_scheduler.LambdaLR(
-        #     optimizer=optimizer,
-        #     lr_lambda=[lambda_lr_warmstarted]
-        # )
-        # scheduler = th.optim.lr_scheduler.StepLR(
-        #     optimizer=optimizer,
-        #     step_size=1,
-        #     gamma=0.8,
-        #     # last_epoch=self.decay_epochs[-1]
-        # )
-        # scheduler = th.optim.lr_scheduler.CosineAnnealingLR(
-        #     optimizer=optimizer,
-        #     T_max=self.decay_epochs[-1]
-        # )
+
         scheduler = th.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer=optimizer,
             factor=0.9,
             patience=5,
             min_lr=1e-8)
-        # scheduler = th.optim.lr_scheduler.CosineAnnealingWarmRestarts(
-        #     optimizer=optimizer,
-        #     T_0=30,
-        #     T_mult=1,
-        #     eta_min=1e-4,
-        #     last_epoch=-1
-        # )
-        # scheduler = th.optim.lr_scheduler.MultiStepLR(optimizer=optimizer,
-        #                                        milestones=self.decay_epochs,
-        #                                        gamma=0.1)
         lr_scheduler = {
             'scheduler': scheduler,
             'name': 'learning_rate',

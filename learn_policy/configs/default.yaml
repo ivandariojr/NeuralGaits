@@ -1,7 +1,7 @@
 defaults:
   - module/composite_barrier: CompositeBarrier
   - module/zdyn: ZeroDynamics
-  - module/yd: CubicMLP
+  - module/yd: MLP
   - module: GeneralLearning
   - experiment
   - _self_
@@ -19,7 +19,4 @@ module:
   opt_name: 'AdamW'
   weight_decay: 1e-4
   momentum: 0.9
-#  decay_epochs: [50, 400, 800]
-  decay_epochs: [100, 400, 800]
-#  yd:
-#    n_hidden: 1
+  decay_epochs: [50, 200, 600]

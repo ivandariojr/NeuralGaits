@@ -12,7 +12,7 @@ from dynamics import RefinementZeroDynamics, ZeroDynamics
 from common import exp_cfg
 
 ROOT = Path(__file__).parent
-run_data_root = ROOT / 'run_data'
+run_data_root = ROOT.parent / 'run_data'
 config_path = ROOT / 'configs'
 
 # def set_debug_apis(state: bool = False):
@@ -175,7 +175,7 @@ class Experiment:
             callbacks = [
                 pl.callbacks.LearningRateMonitor(logging_interval='step'),
                 pl.callbacks.ModelCheckpoint(monitor='training_loss',
-                                             save_top_k=1000,
+                                             save_top_k=1,
                                              mode='min',
                                              every_n_epochs=1,
                                              save_on_train_epoch_end=True),

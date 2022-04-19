@@ -7,12 +7,11 @@ from torchdiffeq import odeint_event, odeint_adjoint, odeint
 
 import D_matrix
 from Phi import Phi
-from deprecated import AmberDynamics
 from p_z_swing import p_z_swing
 from v_z_swing import v_z_swing
 from utils import to_tuple
 from zero_dynamics import dz_2, Psi_Z_intermediate_1
-
+from amber_dynamics import AmberDynamics
 
 class ZeroDynamics(nn.Module):
     def __init__(self, yd):

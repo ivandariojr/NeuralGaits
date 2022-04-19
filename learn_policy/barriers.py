@@ -15,7 +15,6 @@ from J_contact import J_contact
 from utils import to_tuple
 import numpy as np
 from math import sqrt
-from DynamicsTest import AmberDynamics
 import omegaconf
 import hydra
 
@@ -510,14 +509,14 @@ class OutputSymmetryWithVelLoss(AbstractBarrier):
     def col_names(self):
         return [f"OutputSymmetryWithVelLoss{i}" for i in range(2)]
 
-class FullStateSymmetry(AbstractBarrier):
-    def __init__(self, zdyn, lb, ub, alpha_lb, alpha_ub,
-                 apply_to_post_impact=False):
-        super().__init__(zdyn, lb, ub, alpha_lb, alpha_ub, apply_to_post_impact)
-        self.register_buffer("R", th.tensor([[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]],dtype=th.float32))
-
-    def forward(self, zs, zdots):
-        return (-th.abs(self.zdyn.phi_inv(self.zdyn.reset_map(zs)) - AmberDynamics.reset_map(self.zdyn.phi_inv(zs))))[:, :5]
+# class FullStateSymmetry(AbstractBarrier):
+#     def __init__(self, zdyn, lb, ub, alpha_lb, alpha_ub,
+#                  apply_to_post_impact=False):
+#         super().__init__(zdyn, lb, ub, alpha_lb, alpha_ub, apply_to_post_impact)
+#         self.register_buffer("R", th.tensor([[0, 0, 0, 1], [0, 0, 1, 0], [0, 1, 0, 0], [1, 0, 0, 0]],dtype=th.float32))
+#
+#     def forward(self, zs, zdots):
+#         return (-th.abs(self.zdyn.phi_inv(self.zdyn.reset_map(zs)) - AmberDynamics.reset_map(self.zdyn.phi_inv(zs))))[:, :5]
 
 class OrbitalBarrier(AbstractBarrier):
     def __init__(self, zdyn, lb, ub, alpha_lb, alpha_ub,
@@ -584,81 +583,81 @@ class ZBounds(AbstractBarrier):
     def col_names(self):
         return [f"ZBounds{i}" for i in range(2)]
 
-class GRF(AbstractBarrier):
-    def __init__(self, zdyn, lb, ub, alpha_lb, alpha_ub, mu,
-                 apply_to_post_impact=True,):
-        super().__init__(zdyn, lb, ub, alpha_lb, alpha_ub, apply_to_post_impact)
-        self.register_buffer("mu", th.tensor(mu))
-        self.register_buffer("mass", th.tensor(21.5562))
-
-    @staticmethod
-    def _v_com(state):
-        state_params = to_tuple(state, dim=-1)
-        v_x_com_eval = v_x_com(*state_params)
-        v_z_com_eval = v_z_com(*state_params)
-        return th.cat([v_x_com_eval, v_z_com_eval], dim=-1)
-
-    def forward(self, zs, zdots):
-        state = self.zdyn.phi_inv(zs)
-        xddot = AmberDynamics.xddot(state, self.zdyn.input(zs))
-        v_com, vcom_dot = th.autograd.functional.jvp(func=GRF._v_com,
-                                              inputs=state,
-                                              v=xddot[:, :, 0],
-                                              create_graph=True)
-        grf = -self.mass * vcom_dot
-        return (-grf[:, 0] + self.mu*grf[:, 1])[:, None]
-
-class GRFCorrect(AbstractBarrier):
-    def __init__(self, zdyn, lb, ub, alpha_lb, alpha_ub, mu,
-                 apply_to_post_impact=True,):
-        super().__init__(zdyn, lb, ub, alpha_lb, alpha_ub, apply_to_post_impact)
-        self.register_buffer("mu", th.tensor(mu))
-        self.register_buffer("mass", th.tensor(21.5562))
-
-    @staticmethod
-    def _v_com(state):
-        state_params = to_tuple(state, dim=-1)
-        v_x_com_eval = v_x_com(*state_params)
-        v_z_com_eval = v_z_com(*state_params)
-        return th.cat([v_x_com_eval, v_z_com_eval], dim=-1)
-
-    def forward(self, zs, zdots):
-        state = self.zdyn.phi_inv(zs)
-        xddot = AmberDynamics.xddot(state, self.zdyn.input(zs))
-        v_com, vcom_dot = th.autograd.functional.jvp(func=GRF._v_com,
-                                              inputs=state,
-                                              v=xddot[:, :, 0],
-                                              create_graph=True)
-        grf = -self.mass * vcom_dot
-        return th.stack([(-grf[:, 0] + self.mu*grf[:, 1])[:, None], (grf[:, 0] + self.mu*grf[:, 1])[:, None]], dim=1)[:, :, 0]
-
-    def col_names(self):
-        return [f"GRF{i}" for i in range(2)]
-
-class GRFCorrectLoss(AbstractBarrier):
-    def __init__(self, zdyn, lb, ub, alpha_lb, alpha_ub, mu, loss_gain,
-                 apply_to_post_impact=True,):
-        super().__init__(zdyn, lb, ub, alpha_lb, alpha_ub, apply_to_post_impact)
-        self.register_buffer("mu", th.tensor(mu))
-        self.register_buffer("mass", th.tensor(21.5562))
-        self.register_buffer("loss_gain", th.tensor(loss_gain))
-
-    @staticmethod
-    def _v_com(state):
-        state_params = to_tuple(state, dim=-1)
-        v_x_com_eval = v_x_com(*state_params)
-        v_z_com_eval = -v_z_com(*state_params)
-        return th.cat([v_x_com_eval, v_z_com_eval], dim=-1)
-
-    def forward(self, zs, zdots):
-        state = self.zdyn.phi_inv(zs)
-        xddot = AmberDynamics.xddot(state, self.zdyn.input(zs))
-        v_com, vcom_dot = th.autograd.functional.jvp(func=GRF._v_com,
-                                              inputs=state,
-                                              v=xddot[:, :, 0],
-                                              create_graph=True)
-        grf = -self.mass * vcom_dot
-        return self.loss_gain*(th.relu(-((-grf[:, 0] + self.mu*grf[:, 1])[:, None])) + th.relu(-((grf[:, 0] + self.mu*grf[:, 1])[:, None])))
+# class GRF(AbstractBarrier):
+#     def __init__(self, zdyn, lb, ub, alpha_lb, alpha_ub, mu,
+#                  apply_to_post_impact=True,):
+#         super().__init__(zdyn, lb, ub, alpha_lb, alpha_ub, apply_to_post_impact)
+#         self.register_buffer("mu", th.tensor(mu))
+#         self.register_buffer("mass", th.tensor(21.5562))
+#
+#     @staticmethod
+#     def _v_com(state):
+#         state_params = to_tuple(state, dim=-1)
+#         v_x_com_eval = v_x_com(*state_params)
+#         v_z_com_eval = v_z_com(*state_params)
+#         return th.cat([v_x_com_eval, v_z_com_eval], dim=-1)
+#
+#     def forward(self, zs, zdots):
+#         state = self.zdyn.phi_inv(zs)
+#         xddot = AmberDynamics.xddot(state, self.zdyn.input(zs))
+#         v_com, vcom_dot = th.autograd.functional.jvp(func=GRF._v_com,
+#                                               inputs=state,
+#                                               v=xddot[:, :, 0],
+#                                               create_graph=True)
+#         grf = -self.mass * vcom_dot
+#         return (-grf[:, 0] + self.mu*grf[:, 1])[:, None]
+#
+# class GRFCorrect(AbstractBarrier):
+#     def __init__(self, zdyn, lb, ub, alpha_lb, alpha_ub, mu,
+#                  apply_to_post_impact=True,):
+#         super().__init__(zdyn, lb, ub, alpha_lb, alpha_ub, apply_to_post_impact)
+#         self.register_buffer("mu", th.tensor(mu))
+#         self.register_buffer("mass", th.tensor(21.5562))
+#
+#     @staticmethod
+#     def _v_com(state):
+#         state_params = to_tuple(state, dim=-1)
+#         v_x_com_eval = v_x_com(*state_params)
+#         v_z_com_eval = v_z_com(*state_params)
+#         return th.cat([v_x_com_eval, v_z_com_eval], dim=-1)
+#
+#     def forward(self, zs, zdots):
+#         state = self.zdyn.phi_inv(zs)
+#         xddot = AmberDynamics.xddot(state, self.zdyn.input(zs))
+#         v_com, vcom_dot = th.autograd.functional.jvp(func=GRF._v_com,
+#                                               inputs=state,
+#                                               v=xddot[:, :, 0],
+#                                               create_graph=True)
+#         grf = -self.mass * vcom_dot
+#         return th.stack([(-grf[:, 0] + self.mu*grf[:, 1])[:, None], (grf[:, 0] + self.mu*grf[:, 1])[:, None]], dim=1)[:, :, 0]
+#
+#     def col_names(self):
+#         return [f"GRF{i}" for i in range(2)]
+#
+# class GRFCorrectLoss(AbstractBarrier):
+#     def __init__(self, zdyn, lb, ub, alpha_lb, alpha_ub, mu, loss_gain,
+#                  apply_to_post_impact=True,):
+#         super().__init__(zdyn, lb, ub, alpha_lb, alpha_ub, apply_to_post_impact)
+#         self.register_buffer("mu", th.tensor(mu))
+#         self.register_buffer("mass", th.tensor(21.5562))
+#         self.register_buffer("loss_gain", th.tensor(loss_gain))
+#
+#     @staticmethod
+#     def _v_com(state):
+#         state_params = to_tuple(state, dim=-1)
+#         v_x_com_eval = v_x_com(*state_params)
+#         v_z_com_eval = -v_z_com(*state_params)
+#         return th.cat([v_x_com_eval, v_z_com_eval], dim=-1)
+#
+#     def forward(self, zs, zdots):
+#         state = self.zdyn.phi_inv(zs)
+#         xddot = AmberDynamics.xddot(state, self.zdyn.input(zs))
+#         v_com, vcom_dot = th.autograd.functional.jvp(func=GRF._v_com,
+#                                               inputs=state,
+#                                               v=xddot[:, :, 0],
+#                                               create_graph=True)
+#         grf = -self.mass * vcom_dot
+#         return self.loss_gain*(th.relu(-((-grf[:, 0] + self.mu*grf[:, 1])[:, None])) + th.relu(-((grf[:, 0] + self.mu*grf[:, 1])[:, None])))
 
 def findCircle(x1, y1, x2, y2, x3, y3):
     M = np.matrix([[x1 ** 2 + y1 ** 2, x1, y1, 1], [x2 ** 2 + y2 ** 2, x2, y2, 1], [x3 ** 2 + y3 ** 2, x3, y3, 1]])
