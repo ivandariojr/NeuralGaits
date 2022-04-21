@@ -19,7 +19,7 @@ using YDesReturnVector  = Eigen::Matrix<float, 8, 1, Eigen::ColMajor>;
 //using MatrixXfRow = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 //using TensorXfRow = Eigen::Tensor<float, 3, Eigen::RowMajor>;
 
-std::vector<at::Tensor> make_paramter_vector(const torch::jit::script::Module & module){
+inline std::vector<at::Tensor> make_paramter_vector(const torch::jit::script::Module & module){
   std::vector<at::Tensor> paramlist;
   for (const auto &parameter: module.parameters()) {
     paramlist.push_back(parameter);
