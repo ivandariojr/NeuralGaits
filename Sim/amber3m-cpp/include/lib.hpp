@@ -5,7 +5,7 @@
 #include <Eigen/Core>
 #include <vector>
 
-#define PORT 8080 
+#define PORT 8081
 
 enum programState {Running, Exit, Initializing};
 class Robot;

@@ -31,7 +31,6 @@
 using namespace Eigen;
 using namespace std;
 
-#define ParamPort 8080
 
 // Global Variables
 pthread_t thread1, thread2, thread3;
@@ -120,7 +119,7 @@ int main(int argc, char **argv) {
 		amber.setEstimator(new RaiSim(*new_socket));
 
 //    MLP traj = MLP("/home/noel/learn_trajoptss/AMBER/run_data/Trial" + Trial + "/mlp" + Iter + ".thc");
-    MLP traj = MLP("/home/noel/learn_trajopt/AMBER/run_data/wandb_saves/model.thc");
+    MLP traj = MLP(config["MLPLocation"].as<string>());
 //    MLP traj = MLP("/home/noel/learn_trajopt/AMBER/models/distilled9999.thc");
     ZVector z_0(2);
     ZVector dz_0(2);

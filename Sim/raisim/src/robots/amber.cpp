@@ -38,7 +38,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
-#define PORT 8080
+#define PORT 8081
 
 #define PI 3.1415926535
 #define BezOrd 4
@@ -113,8 +113,6 @@ int main(int argc, char **argv) {
     }
 
     YAML::Node gains = YAML::LoadFile("param_gain.yaml");
-    double P = gains["P"].as<double>();
-    double D = gains["D"].as<double>();
     double td0 = gains["td0"].as<double>();
     double xd0 = gains["xd0"].as<double>();
     double z0 = gains["z0"].as<double>();
@@ -152,13 +150,6 @@ int main(int argc, char **argv) {
     auto ground = world.addGround(0,"steel");
     ground->setName("checkerboard");
 
-    std::vector<raisim::Box*> stones;
-    std::vector<double> stone_pos = gains["stone_pos"].as<std::vector<double>>();
-    double num_stones = gains["num_stones"].as<double>();
-    double stone_width = gains["stone_width"].as<double>();
-    double stone_thickness = gains["stone_thickness"].as<double>();
-    double abs_dist = 0;
-
     std::vector<raisim::ArticulatedSystem*> amber;
 
     /// create visualizer objects
@@ -183,7 +174,7 @@ int main(int argc, char **argv) {
     std::cout<<"Start"<<std::endl;
 
     // lambda function for the controller
-    auto controller = [&vis, &amber, &generator, &distribution, freq, ts, sock, &buffer, &actState, P, D]() {
+    auto controller = [&vis, &amber, &generator, &distribution, freq, ts, sock, &buffer, &actState]() {
         int  valread;
         double t;
         std::ofstream jointFile;

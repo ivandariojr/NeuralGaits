@@ -9,7 +9,7 @@ defaults:
 data_loader_workers: 0
 max_epochs: 2000
 batch_size: 16
-pretrained_yd: "model-lk55mmxr:v368"
+#pretrained_yd: "model-lk55mmxr:v368"
 #pretrained_yd: ../models/distilled9999.th
 gpus: 0
 seed: 1

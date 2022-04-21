@@ -17,7 +17,7 @@ import exp_cfg
 
 ROOT = Path(__file__).parent.parent
 run_data_root = ROOT / 'run_data'
-config_path = ROOT / 'configs'
+config_path = ROOT / 'learn_dynamics' / 'configs'
 
 def get_module_name(config):
     return str(config._metadata.object_type).split('.')[-1][:-2]

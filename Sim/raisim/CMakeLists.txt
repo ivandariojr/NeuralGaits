@@ -3,7 +3,7 @@ project(raisimOgre_examples VERSION 0.2.0)
 
 find_package(raisimOgre CONFIG REQUIRED)
 find_package(Eigen3 REQUIRED HINTS ${Eigen3_HINT})
-find_package(yaml-cpp REQUIRED PATHS /usr/local/lib/yaml-cpp-yaml-cpp-0.6.0/include/yaml-cpp)
+find_package(yaml-cpp REQUIRED)
 
 #==
 # Build Targets

@@ -62,7 +62,9 @@ wcLimbs: 0.2
 # tau_min: 0.5
 # torso_min: -0.125
 
-NeuralGaitLocation: /home/noel/learn_trajopt/AMBER/NeuralGaitsInitialConditions.yaml
+NeuralGaitLocation: ../../configs/NeuralGaitsInitialConditions.yaml
+# MLPLocation: '../../../run_data/tensorboard_output/zdyn:ZeroDynamics_yd:MLP_cb:(2,3,2)_b:4096_lr:0.01_opt:AdamW/version_0/checkpoints/epoch=991-step=991.ckpt'
+MLPLocation: '../../../run_data/distilled9999.thc'
 dataLog: data.csv
 
 
