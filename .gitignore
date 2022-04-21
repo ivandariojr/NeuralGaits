@@ -1,3 +1,6 @@
 Sim/learn-trajopt-cpp/build
 Sim/amber3m-cpp/build
 run_data
+learn_dynamics/outputs
+learn_policy/outputs
+.idea
