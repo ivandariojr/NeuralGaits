@@ -4,6 +4,14 @@ Install the python dependencies listed in ``requirements.txt``.
 ```
 pip -r requirements.txt
 ```
+
+In general all python commands assume you ``PYTHONPATH`` includes the 
+``common`` and ``common/RaisimDynamics`` directories as follows:
+
+```
+ export PYTHONPATH=$PYTHONPATH:/path/to/NeuralGaits/common:/path/to/NeuralGaits/common/RaiSimDynamics
+```
+
 ### Policy Learning
 
 Run the following command to train a walking policy from scratch using the 
@@ -11,14 +19,42 @@ nominal model. This command assumes the working directory is
 ``/path/to/NeuralGaits/learn_policy``:
 
 ```
-PYTHONPATH=$PYTHONPATH:/path/to/NeuralGaits/common:/path/to/NeuralGaits
-/common/RaiSimDynamics main.py
+python main.py
 ```
+
+This should create a tensorboard directory corresponding to the experiment 
+in ``run_data/tensorboard_output``. Inside that directory there will be 
+multiple version directories corresponding to each run of the experiment 
+with the same parameters. For the version you chose, copy the path of the 
+desired checkpoint in the checkpoints directory. Then run the following 
+command from the ``learn_policy`` directory:
+
+```
+python chkpt_to_thc.py --ckpt_path /path/to/file.ckpt
+```
+
+This generates a torchscript file from the model trained which can be used 
+to run using the raisim simulator.
 
 ### Dynamics Learning
 
+All code related to learning the projection of the dynamics error onto the 
+zero dynamics manifold assumes the current directory is ``learn_dynamics``. The 
+projection to the zero dynamics manifold depends on the definition of the 
+policy. Thus, to learnt he error term run the following command:
+
+```
+python main.py +pretrained_yd=/path/to/learned/policy.ckpt
+```
+
 ### Policy Refinement
 
+To refine a policy given a learned zero dynamics model run the following 
+command from the ``learn_policy`` directory:
+
+```
+python main.py +pretrained_model=/path/to/trained/policy/model.ckpt +pretrained_zdyn=/path/to/trained/zero/dynamics/model.ckpt
+```
 
 ## Setting up the Simulation Environment
 First, we recommend setting ```${INSTALL_DIR}``` to be a convenient directory where you would like everything to be installed (via the export command in your bashrc, for example). Then, for all cmake commands below, add

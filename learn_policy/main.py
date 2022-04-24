@@ -155,13 +155,6 @@ class Experiment:
 
         self.cfg = cfg
 
-        # logger = pl_loggers.WandbLogger(
-        #     name=self.create_log_name(),
-        #     entity="ivan",
-        #     project=project,
-        #     log_model = "all",
-        #     save_dir=str(run_data_root / 'wandb_output'),
-        # )
         logger = pl_loggers.TensorBoardLogger(
             name=self.create_log_name(),
             # project=project,
@@ -194,19 +187,14 @@ class Experiment:
 
     def run(self, checkpoint_module=None):
         if checkpoint_module is None:
-            #TODO: Dangerous don't this at home.
+            #TODO: Dangerous this assumes model is D1MLP.
             if self.cfg.pretrained_model is not None:
                 pretrained = th.load(self.cfg.pretrained_model)
-                D1MLP.instance = pretrained
+                D1MLP.instance = pretrained['yd']
             if self.cfg.pretrained_zdyn is not None:
                 print("[INFO] Refining Pretrained Zdyn")
                 # download and instantiate zdyn ignore everything else
-                save_dir = Path(__file__).parent / "run_data" / "wandb_saves"
-                import wandb
-                api = wandb.Api()
-                artifact = api.artifact(f"ivan/SampledWalkingDyn/{self.cfg.pretrained_zdyn}")
-                file_location = artifact.file(root=str(save_dir))
-                model_ckpt = th.load(file_location)
+                model_ckpt = th.load(self.cfg.pretrained_zdyn)
                 learned_zdyn = model_ckpt['zdyn'].to('cpu')
                 refinement_zdyn = RefinementZeroDynamics(yd=learned_zdyn.yd,
                                                      epsilon=learned_zdyn.epsilon)

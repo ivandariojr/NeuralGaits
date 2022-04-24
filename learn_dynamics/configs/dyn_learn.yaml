@@ -9,15 +9,12 @@ defaults:
 data_loader_workers: 0
 max_epochs: 2000
 batch_size: 16
-#pretrained_yd: "model-lk55mmxr:v368"
-#pretrained_yd: ../models/distilled9999.th
+#pretrained_yd: /path/to/model.th
 gpus: 0
 seed: 1
-#datasets: ['LearnTrajopt_mh25_v519_trial4']
-#datasets: ['LearTrajopt_model-l30zucf7:v999_trial22_Ref0_ta_m_0.06']
-datasets: ['LearTrajopt__bk0_v999_trial25_Ref!_REALREF_with_no_bugs',
-           'LearTrajopt__bk0_v999_trial26_Ref!_REALREF_with_no_bugs',
-           'LearTrajopt__bk0_v999_trial27_Ref!_REALREF_with_no_bugs']
+datasets: ['RUN0',
+           'RUN1',
+           'RUN2']
 delta_t: 10
 n_steps: 3
 module:
@@ -30,5 +27,3 @@ module:
     epsilon:
       n_hidden: 128
       n_output: 2
-#      neg_lim: [-15, 15]
-#      pos_lim: [-15, 15]

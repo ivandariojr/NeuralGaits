@@ -1,7 +1,4 @@
-import os
 from pathlib import Path
-import pl_modules
-import barriers
 import hydra
 import pytorch_lightning as pl
 from models import D1MLP
@@ -28,12 +25,11 @@ class Experiment:
 
         self.cfg = cfg
 
-        logger = pl_loggers.WandbLogger(
+        logger = pl_loggers.TensorBoardLogger(
             name=self.create_log_name(),
-            entity="ivan",
-            project=project,
-            log_model = "all",
-            save_dir=str(run_data_root / 'wandb_output'),
+            # project=project,
+            # log_model = "all",
+            save_dir=str(run_data_root / 'tensorboard_output'),
         )
         logger.log_hyperparams(dict(self.cfg))
         OmegaConf.resolve(cfg)
@@ -42,7 +38,7 @@ class Experiment:
             callbacks = [
                 pl.callbacks.LearningRateMonitor(logging_interval='step'),
                 pl.callbacks.ModelCheckpoint(monitor='training_loss',
-                                             save_top_k=1000,
+                                             save_top_k=1,
                                              mode='min',
                                              every_n_train_steps=1,
                                              save_on_train_epoch_end=True),
@@ -62,12 +58,7 @@ class Experiment:
         if checkpoint_module is None:
             #TODO: Dangerous don't this at home.
             if self.cfg.pretrained_yd is not None:
-                save_dir = Path(__file__).parent.parent / "run_data" / "wandb_saves"
-                import wandb
-                api = wandb.Api()
-                artifact = api.artifact(f"ivan/SampledWalking/{self.cfg.pretrained_yd}")
-                file_location = artifact.file(root=str(save_dir))
-                model_ckpt = th.load(file_location)
+                model_ckpt = th.load(self.cfg.pretrained_yd)
                 pretrained = model_ckpt['yd']
                 D1MLP.instance = pretrained
             module = hydra.utils.instantiate(self.cfg.module)

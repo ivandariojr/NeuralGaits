@@ -5,7 +5,7 @@ from torch.utils.data.dataset import T_co
 import torch as th
 import numpy as np
 
-data_root = Path(__file__).parent / 'data' / 'real_data'
+data_root = Path(__file__).parent / 'data'
 
 HEADER = ["t","tau","switchBack","tau_d","tau_a","stance","fullState_1","fullState_2","fullState_3","fullState_4","fullState_5","fullState_6","fullState_7","fullState_8","fullState_9","fullState_10","desState1","desState2","desState3","desState4","desState5","desState6","desState7","desState8","torque1","torque2","torque3","torque4","u_des1","u_des2","u_des3","u_des4","idk1","idk2","idk3","idk4","idk5","idk6"]
 

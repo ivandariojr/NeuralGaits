@@ -9,8 +9,8 @@ defaults:
 data_loader_workers: 0
 max_epochs: 1000
 batch_size: 4096
-#pretrained_model: /home/noel/learn_trajopt/AMBER/models/distilled9999.th
-#pretrained_zdyn: "model-30knx72j:v217"
+#pretrained_model: /path/to/trained/policy/model.ckpt
+#pretrained_zdyn: "/path/to/trained/zero/dynamics/model.ckpt"
 gpus: 1
 seed: 1
 dataset: OrbitalSampler
